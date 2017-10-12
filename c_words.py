@@ -10,15 +10,16 @@
 # important! in a syllable: onset = starting consonants, nucleus = middle vowels, coda = ending consonants
 
 import random as rd
+from numpy.random import choice
 
 def gen_syll():
 
 	vowels = ["a", "ae", "e", "i", "o", "u"]
 	consonants = ["d", "dd", "c", "cc", "f", "ff", "h", "hh", "l", "ll", "m", "n", "nn", "p", "pp", "r", "rr", "s", "ss", "t", "tt", "y", "yy", "z", "zz"]
 	
-	# I don't necessary classify consonants correctly here -- for example, LL is not a fricative and Y is, but I'm classifying them this way to make it all easier for myself. 
+	# I don't necessary classify consonants correctly here -- for example, LL is not a fricative and Y is, but I'm classifying them this way to make it all easier for myself
 	
-	consonants = {"d": ["fric", 1], "dd": "fric", "c": "stop", "cc": "stop", "f": "fric", "ff": "fric", "h": "other", "hh": "other", "l": "other", "ll": "fric", "m": "other", "n": "other", "nn": "other", "p": "stop", "pp": "stop", "r": "fric", "rr": "other", "s": "fric", "ss": "fric", "t": "stop", "tt": "stop", "y": "other", "yy": "other", "z": "fric", "zz": "fric"}
+	consonants2 = {"d": ["fric", 0.05], "dd": ["fric", 0.03], "c": ["stop", 0.05], "cc": ["stop", 0.03], "f": ["fric", 0.05], "ff": ["fric", 0.03], "h": ["other", 0.05], "hh": ["other", 0.03], "l": ["other", 0.04], "ll": ["fric", 0.04], "m": ["other", 0.04], "n": ["other", 0.05], "nn": ["other", 0.03], "p": ["stop", 0.05], "pp": ["stop", 0.03], "r": ["fric", 0.05], "rr": ["other", 0.03], "s": ["fric", 0.05], "ss": ["fric", 0.03], "t": ["stop", 0.05], "tt": ["stop", 0.03], "y": ["other", 0.05], "yy": ["other", 0.03], "z": ["fric", 0.05], "zz": ["fric", 0.03]}
 	
 	frics = ["d", "dd", "f", "ff", "ll", "r", "s", "ss", "z", "zz"]
 	stops = ["c", "cc", "p", "pp", "t", "tt"]

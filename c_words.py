@@ -12,17 +12,42 @@
 import random as rd
 from numpy.random import choice
 
+# converts weight numbers so that they sum to 1!! doesn't work yet though whoops
+
+def convert(list):
+	newlist = []
+	for n in list:
+		new = ((n*100)/len(list))*0.001
+		newlist.append(new)
+	return newlist
+
+
 def gen_syll():
 
 	vowels = ["a", "ae", "e", "i", "o", "u"]
-	consonants = ["d", "dd", "c", "cc", "f", "ff", "h", "hh", "l", "ll", "m", "n", "nn", "p", "pp", "r", "rr", "s", "ss", "t", "tt", "y", "yy", "z", "zz"]
 	
 	# I don't necessary classify consonants correctly here -- for example, LL is not a fricative and Y is, but I'm classifying them this way to make it all easier for myself
 	
-	consonants2 = {"d": ["fric", 0.05], "dd": ["fric", 0.03], "c": ["stop", 0.05], "cc": ["stop", 0.03], "f": ["fric", 0.05], "ff": ["fric", 0.03], "h": ["other", 0.05], "hh": ["other", 0.03], "l": ["other", 0.04], "ll": ["fric", 0.04], "m": ["other", 0.04], "n": ["other", 0.05], "nn": ["other", 0.03], "p": ["stop", 0.05], "pp": ["stop", 0.03], "r": ["fric", 0.05], "rr": ["other", 0.03], "s": ["fric", 0.05], "ss": ["fric", 0.03], "t": ["stop", 0.05], "tt": ["stop", 0.03], "y": ["other", 0.05], "yy": ["other", 0.03], "z": ["fric", 0.05], "zz": ["fric", 0.03]}
+	consonantdict = {"d": ["fric", 0.05], "dd": ["fric", 0.03], "c": ["stop", 0.05], "cc": ["stop", 0.03], "f": ["fric", 0.05], "ff": ["fric", 0.03], "h": ["other", 0.05], "hh": ["other", 0.03], "l": ["other", 0.04], "ll": ["fric", 0.04], "m": ["other", 0.04], "n": ["other", 0.05], "nn": ["other", 0.03], "p": ["stop", 0.05], "pp": ["stop", 0.03], "r": ["fric", 0.05], "rr": ["other", 0.03], "s": ["fric", 0.05], "ss": ["fric", 0.03], "t": ["stop", 0.05], "tt": ["stop", 0.03], "y": ["other", 0.05], "yy": ["other", 0.03], "z": ["fric", 0.05], "zz": ["fric", 0.03]}
 	
-	frics = ["d", "dd", "f", "ff", "ll", "r", "s", "ss", "z", "zz"]
-	stops = ["c", "cc", "p", "pp", "t", "tt"]
+	consonants = consonantdict.keys()
+	weights = []
+	fricdict = {}
+	stopdict = {}
+	fricweights = []
+	stopweights = []
+	
+	for letter in sorted(consonantdict.keys()):
+		weights.append(consonantdict[letter][1])
+		if consonantdict[letter][0] == "fric":
+			fricdict.update({letter: consonantdict[letter][1]})
+		if consonantdict[letter][0] == "stop":
+			stopdict.update({letter: consonantdict[letter][1]})
+	
+	for key in sorted(fricdict.keys()):
+		fricweights.append(fricdict[key])
+	for key in sorted(stopdict.keys()):
+		stopweights.append(stopdict[key])
 
 	syll = ""
 
@@ -33,27 +58,27 @@ def gen_syll():
 	coda_num = rd.randint(1,6)
 
 	if is_onset == 1:
-		syll = syll + rd.choice(consonants)
+		syll = syll + choice(consonants, p=weights)
 	
 	# nucleus
 	
 	syll = syll + rd.choice(vowels)
 	
-	no = ["h", "hh", "y", "yy"]
-	
-	for letter in no:
-		consonants.remove(letter)
-	
 	# coda
 	
+# 	no = ["h", "hh", "y", "yy"]
+# 	
+# 	for letter in no:
+# 		consonants.remove(letter)
+	
 	if coda_num == 2:
-		fric = rd.choice(frics)
-		for letter in stops:
+		fric = choice(fricdict.keys(), p=fricweights)
+		for letter in stopdict:
 			if len(letter) != len(fric) and letter != "r":
-				stops.remove(letter)
-		syll = syll + fric + rd.choice(stops)
+				if letter in stopdict: del stopdict[letter]
+		syll = syll + fric + choice(stopdict.keys(), p=stopweights)
 	else:
-		syll = syll + rd.choice(consonants)
+		syll = syll + choice(consonants, p=weights)
 	
 	return syll
 

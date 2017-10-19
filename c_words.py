@@ -2,8 +2,6 @@
 # ae = ash
 
 # some goals:
-# make probability of some letters higher
-# have a dictionary that classes consonants as fricatives or stops (or other)
 # make it less likely for one sound to be repeated throughout a word
 # if the last syllable ends with two consonants, make it so that the next syllable has no onset (starts with a vowel)
 
@@ -17,7 +15,7 @@ from numpy.random import choice
 def convert(list):
 	newlist = []
 	for n in list:
-		new = ((n*100)/len(list))*0.001
+		new = n/float(sum(list))
 		newlist.append(new)
 	return newlist
 
@@ -28,7 +26,7 @@ def gen_syll():
 	
 	# I don't necessary classify consonants correctly here -- for example, LL is not a fricative and Y is, but I'm classifying them this way to make it all easier for myself
 	
-	consonantdict = {"d": ["fric", 0.05], "dd": ["fric", 0.03], "c": ["stop", 0.05], "cc": ["stop", 0.03], "f": ["fric", 0.05], "ff": ["fric", 0.03], "h": ["other", 0.05], "hh": ["other", 0.03], "l": ["other", 0.04], "ll": ["fric", 0.04], "m": ["other", 0.04], "n": ["other", 0.05], "nn": ["other", 0.03], "p": ["stop", 0.05], "pp": ["stop", 0.03], "r": ["fric", 0.05], "rr": ["other", 0.03], "s": ["fric", 0.05], "ss": ["fric", 0.03], "t": ["stop", 0.05], "tt": ["stop", 0.03], "y": ["other", 0.05], "yy": ["other", 0.03], "z": ["fric", 0.05], "zz": ["fric", 0.03]}
+	consonantdict = {"d": ["fric", 5], "dd": ["fric", 4], "c": ["stop", 6], "cc": ["stop", 3], "f": ["fric", 5], "ff": ["fric", 3], "h": ["other", 3], "hh": ["other", 2], "l": ["other", 4], "ll": ["fric", 4], "m": ["other", 5], "n": ["other", 6], "nn": ["other", 2], "p": ["stop", 3], "pp": ["stop", 2], "r": ["fric", 5], "rr": ["other", 2], "s": ["fric", 5], "ss": ["fric", 3], "t": ["stop", 5], "tt": ["stop", 3], "y": ["other", 4], "yy": ["other", 2], "z": ["fric", 5], "zz": ["fric", 3]}
 	
 	consonants = consonantdict.keys()
 	weights = []
@@ -44,11 +42,8 @@ def gen_syll():
 		if consonantdict[letter][0] == "stop":
 			stopdict.update({letter: consonantdict[letter][1]})
 	
-	for key in sorted(fricdict.keys()):
-		fricweights.append(fricdict[key])
-	for key in sorted(stopdict.keys()):
-		stopweights.append(stopdict[key])
-
+	weights = convert(weights)
+		
 	syll = ""
 
 	# is there an onset? 0 = no; 1 = yes
@@ -65,20 +60,47 @@ def gen_syll():
 	syll = syll + rd.choice(vowels)
 	
 	# coda
+	# the letters in the list "no" cannot be present in the coda
+	# if there are 2 letters in the coda, there are certain rules about what they can be
 	
-# 	no = ["h", "hh", "y", "yy"]
-# 	
-# 	for letter in no:
-# 		consonants.remove(letter)
+	no = ["h", "hh", "y", "yy"]
 	
 	if coda_num == 2:
+		
+		for key in sorted(fricdict.keys()):
+			if key not in no:
+				fricweights.append(fricdict[key])
+		
+		fricweights = convert(fricweights)
+		
 		fric = choice(fricdict.keys(), p=fricweights)
-		for letter in stopdict:
-			if len(letter) != len(fric) and letter != "r":
-				if letter in stopdict: del stopdict[letter]
-		syll = syll + fric + choice(stopdict.keys(), p=stopweights)
+		
+		filtered = [letter for letter in stopdict.keys() if (len(letter) == len(fric) or letter == "r")]
+		
+		for key in sorted(stopdict.keys()):
+			if key in filtered:
+				stopweights.append(stopdict[key])
+				
+		stopweights = convert(stopweights)
+			
+		syll = syll + fric + choice(filtered, p=stopweights)
+
 	else:
-		syll = syll + choice(consonants, p=weights)
+		
+		endcons = []
+		endweights = []
+		
+		for letter in sorted(consonantdict.keys()):
+			if letter not in no:
+				endcons.append(letter)
+		
+		for key in sorted(consonantdict.keys()):
+			if key in endcons:
+				endweights.append(consonantdict[key][1])
+		
+		endweights = convert(endweights)
+		
+		syll = syll + choice(endcons, p=endweights)
 	
 	return syll
 

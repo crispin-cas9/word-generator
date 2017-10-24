@@ -3,7 +3,6 @@
 
 # some goals:
 # make it less likely for one sound to be repeated throughout a word
-# if the last syllable ends with two consonants, make it so that the next syllable has no onset (starts with a vowel)
 
 # important! in a syllable: onset = starting consonants, nucleus = middle vowels, coda = ending consonants
 
@@ -20,13 +19,15 @@ def convert(list):
 	return newlist
 
 
-def gen_syll():
-
+def gen_syll(prevcn):
+	
+	# prevcn stands for previous coda number
+	
 	vowels = ["a", "ae", "e", "i", "o", "u"]
 	
 	# I don't necessary classify consonants correctly here -- for example, LL is not a fricative and Y is, but I'm classifying them this way to make it all easier for myself
 	
-	consonantdict = {"d": ["fric", 5], "dd": ["fric", 4], "c": ["stop", 6], "cc": ["stop", 3], "f": ["fric", 5], "ff": ["fric", 3], "h": ["other", 3], "hh": ["other", 2], "l": ["other", 4], "ll": ["fric", 4], "m": ["other", 5], "n": ["other", 6], "nn": ["other", 2], "p": ["stop", 3], "pp": ["stop", 2], "r": ["fric", 5], "rr": ["other", 2], "s": ["fric", 5], "ss": ["fric", 3], "t": ["stop", 5], "tt": ["stop", 3], "y": ["other", 4], "yy": ["other", 2], "z": ["fric", 5], "zz": ["fric", 3]}
+	consonantdict = {"d": ["fric", 5], "dd": ["fric", 4], "c": ["stop", 6], "cc": ["stop", 3], "f": ["fric", 5], "ff": ["fric", 3], "h": ["other", 3], "hh": ["other", 2], "l": ["other", 4], "ll": ["fric", 4], "m": ["other", 5], "n": ["other", 6], "nn": ["other", 2], "p": ["stop", 3], "pp": ["stop", 2], "r": ["fric", 5], "rr": ["other", 2], "s": ["fric", 5], "ss": ["fric", 3], "t": ["stop", 5], "tt": ["stop", 3], "y": ["other", 4], "yy": ["other", 2], "z": ["fric", 4], "zz": ["fric", 3]}
 	
 	consonants = consonantdict.keys()
 	weights = []
@@ -46,10 +47,14 @@ def gen_syll():
 		
 	syll = ""
 
-	# is there an onset? 0 = no; 1 = yes
-	is_onset = rd.randint(0,1)
+	# is there an onset? 0 = no; 1 = yes. if there were 2 consonants in the previous syllable's coda, there will be no onset in this coda
 	
-	# are there two consonants in the coda? picking from 4 numbers to make the probability of 2 consonants smaller
+	if prevcn == 2:
+		is_onset = 0
+	else:
+		is_onset = rd.randint(0,1)
+	
+	# are there two consonants in the coda? picking from 6 numbers to make the probability of 2 consonants smaller
 	coda_num = rd.randint(1,6)
 
 	if is_onset == 1:
@@ -66,6 +71,8 @@ def gen_syll():
 	no = ["h", "hh", "y", "yy"]
 	
 	if coda_num == 2:
+		
+		codanum = 2
 		
 		for key in sorted(fricdict.keys()):
 			if key not in no:
@@ -87,6 +94,8 @@ def gen_syll():
 
 	else:
 		
+		codanum = 1
+		
 		endcons = []
 		endweights = []
 		
@@ -102,17 +111,24 @@ def gen_syll():
 		
 		syll = syll + choice(endcons, p=endweights)
 	
-	return syll
+	return [syll, codanum]
 
 
 def generate():
 	
+	codanum = 1
 	word = ""
 	syllnum = rd.randint(1,3)
 	
 	for x in range(syllnum):
-		word = word + gen_syll()
-	
+		
+		output = gen_syll(codanum)
+		
+		syll = output[0]
+		codanum = output[1]
+		
+		word = word + syll
+			
 	return word
 
 

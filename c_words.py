@@ -1,15 +1,21 @@
 # caemattos word generator
 # ae = ash
 
-# some goals:
-# make it less likely for one sound to be repeated throughout a word
+# THE RULES
+# A doubled letter represents a different sound than a single letter
+# In a syllable: onset = starting consonants, nucleus = middle vowels, coda = ending consonants
+# Onset must be 1 sound (or there can be no onset)
+# Coda is most often 1 sound and cannot be more than 2 sounds
+# Pretty much every non-inflected word ends in a consonant
+# Fricative (as well as LL and R) + stop is allowed in the coda
+# Neither H nor Y are allowed in the coda
 
-# important! in a syllable: onset = starting consonants, nucleus = middle vowels, coda = ending consonants
 
 import random as rd
 from numpy.random import choice
 
-# converts weight numbers so that they sum to 1!! doesn't work yet though whoops
+
+# converts weight numbers so that they sum to 1
 
 def convert(list):
 	newlist = []
@@ -26,6 +32,7 @@ def gen_syll(prevcn):
 	vowels = ["a", "ae", "e", "i", "o", "u"]
 	
 	# I don't necessary classify consonants correctly here -- for example, LL is not a fricative and Y is, but I'm classifying them this way to make it all easier for myself
+	# the numbers in the dict are weights
 	
 	consonantdict = {"d": ["fric", 5], "dd": ["fric", 4], "c": ["stop", 6], "cc": ["stop", 3], "f": ["fric", 5], "ff": ["fric", 3], "h": ["other", 3], "hh": ["other", 2], "l": ["other", 4], "ll": ["fric", 4], "m": ["other", 5], "n": ["other", 6], "nn": ["other", 2], "p": ["stop", 3], "pp": ["stop", 2], "r": ["fric", 5], "rr": ["other", 2], "s": ["fric", 5], "ss": ["fric", 3], "t": ["stop", 5], "tt": ["stop", 3], "y": ["other", 4], "yy": ["other", 2], "z": ["fric", 4], "zz": ["fric", 3]}
 	
@@ -35,6 +42,8 @@ def gen_syll(prevcn):
 	stopdict = {}
 	fricweights = []
 	stopweights = []
+	
+	# creates separate lists for fricatives and stops
 	
 	for letter in sorted(consonantdict.keys()):
 		weights.append(consonantdict[letter][1])
@@ -53,20 +62,23 @@ def gen_syll(prevcn):
 		is_onset = 0
 	else:
 		is_onset = rd.randint(0,1)
-	
-	# are there two consonants in the coda? picking from 6 numbers to make the probability of 2 consonants smaller
-	coda_num = rd.randint(1,6)
 
 	if is_onset == 1:
-		syll = syll + choice(consonants, p=weights)
+		onset = choice(consonants, p=weights)
+		syll = syll + onset
+		consonantdict[onset][1] = 0.5
 	
 	# nucleus
 	
 	syll = syll + rd.choice(vowels)
 	
 	# coda
+	
+	# are there two consonants in the coda? picking from 6 numbers to make the probability of 2 consonants smaller
+	coda_num = rd.randint(1,6)
+	
 	# the letters in the list "no" cannot be present in the coda
-	# if there are 2 letters in the coda, there are certain rules about what they can be
+	# if there are 2 letters in the coda, there are certain rules (described above) about what they can be
 	
 	no = ["h", "hh", "y", "yy"]
 	
@@ -114,6 +126,9 @@ def gen_syll(prevcn):
 	return [syll, codanum]
 
 
+# generates a word made from syllables
+# also tells the syllable it's generating about the coda of the previous syllable
+
 def generate():
 	
 	codanum = 1
@@ -132,5 +147,9 @@ def generate():
 	return word
 
 
+wordlist = []
+
 for y in range(0,11):
-	print generate()
+	wordlist.append(generate())
+
+print wordlist

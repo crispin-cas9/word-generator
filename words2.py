@@ -1,6 +1,9 @@
 # caemattos word generator
 # ae = ash
 
+# THE RULES
+# (C)V(C) syllable structure with no coda at the end of a word
+
 import random as rd
 from numpy.random import choice
 
@@ -19,26 +22,15 @@ def gen_syll():
 		
 	vowels = ["a", "ae", "e", "i", "o", "u"]
 	
-	# I don't necessary classify consonants correctly here -- for example, LL is not a fricative and Y is, but I'm classifying them this way to make it all easier for myself
 	# the numbers in the dict are weights
 	
-	consonantdict = {"d": ["fric", 5], "dd": ["fric", 4], "c": ["stop", 6], "cc": ["stop", 3], "f": ["fric", 5], "ff": ["fric", 3], "h": ["other", 3], "hh": ["other", 2], "l": ["other", 4], "ll": ["fric", 4], "m": ["other", 5], "n": ["other", 6], "nn": ["other", 2], "p": ["stop", 3], "pp": ["stop", 2], "r": ["fric", 5], "rr": ["other", 2], "s": ["fric", 5], "ss": ["fric", 3], "t": ["stop", 5], "tt": ["stop", 3], "y": ["other", 4], "yy": ["other", 2], "z": ["fric", 4], "zz": ["fric", 3]}
+	consonantdict = {"d": 5, "dd": 4, "c": 6, "cc": 3, "f": 5, "ff": 3, "h": 3, "hh": 2, "l": 4, "ll": 4, "m": 5, "n": 6, "nn": 2, "p": 3, "pp": 2, "r": 5, "rr": 2, "s": 5, "ss": 3, "t": 5, "tt": 3, "y": 4, "yy": 2, "z": 4, "zz": 3}
 	
 	consonants = consonantdict.keys()
 	weights = []
-	fricdict = {}
-	stopdict = {}
-	fricweights = []
-	stopweights = []
-	
-	# creates separate lists for fricatives and stops
-	
+		
 	for letter in sorted(consonantdict.keys()):
-		weights.append(consonantdict[letter][1])
-		if consonantdict[letter][0] == "fric":
-			fricdict.update({letter: consonantdict[letter][1]})
-		if consonantdict[letter][0] == "stop":
-			stopdict.update({letter: consonantdict[letter][1]})
+		weights.append(consonantdict[letter])
 	
 	weights = convert(weights)
 		
@@ -47,47 +39,27 @@ def gen_syll():
 	
 	# onset
 	
-	# are there two consonants in the onset? picking from 6 numbers to make the probability of 2 consonants smaller
-	onset_num = rd.randint(1,6)
-	
-	onset_num = 1
-	
-	# if there are 2 letters in the onset, there are certain rules (described above) about what they can be
-		
-	if onset_num == 2:
-		
-		for key in sorted(fricdict.keys()):
-			if key not in no:
-				fricweights.append(fricdict[key])
-		
-		fricweights = convert(fricweights)
-		
-		fric = choice(fricdict.keys(), p=fricweights)
-		
-		filtered = [letter for letter in stopdict.keys() if (len(letter) == len(fric) or letter == "r")]
-		
-		for key in sorted(stopdict.keys()):
-			if key in filtered:
-				stopweights.append(stopdict[key])
-				
-		stopweights = convert(stopweights)
-			
-		syll = syll + fric + choice(filtered, p=stopweights)
+	is_onset = rd.randint(0,1)
 
-	else:
-				
-		startweights = []
-		
-		for key in consonants:
-			startweights.append(consonantdict[key][1])
-		
-		startweights = convert(startweights)
-		
-		syll = syll + choice(consonants, p=startweights)
+	if is_onset == 1:
+		onset = choice(consonants, p=weights)
+		syll = syll + onset
+		consonantdict[onset] = 2
+	
 	
 	# nucleus
 	
 	syll = syll + rd.choice(vowels)
+	
+	
+	# coda
+	# picking from 4 numbers to make the probability of a coda smaller
+	
+	is_coda = rd.randint(0,3)
+
+	if is_coda == 1:
+		coda = choice(consonants, p=weights)
+		syll = syll + coda
 	
 	
 	return syll

@@ -4,6 +4,7 @@
 # THE RULES
 # A doubled letter represents a different sound than a single letter
 # In a syllable: onset = starting consonants, nucleus = middle vowels, coda = ending consonants
+# (C)VC syllable structure
 # Onset must be 1 sound (or there can be no onset)
 # Coda is most often 1 sound and cannot be more than 2 sounds
 # Pretty much every non-inflected word ends in a consonant

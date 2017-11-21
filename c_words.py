@@ -37,7 +37,7 @@ def gen_syll(prevcn):
 	
 	consonantdict = {"d": ["fric", 5], "dd": ["fric", 4], "c": ["stop", 6], "cc": ["stop", 3], "f": ["fric", 5], "ff": ["fric", 3], "h": ["other", 3], "hh": ["other", 2], "l": ["other", 4], "ll": ["fric", 4], "m": ["other", 5], "n": ["other", 6], "nn": ["other", 2], "p": ["stop", 3], "pp": ["stop", 2], "r": ["fric", 5], "rr": ["other", 2], "s": ["fric", 5], "ss": ["fric", 3], "t": ["stop", 5], "tt": ["stop", 3], "y": ["other", 4], "yy": ["other", 2], "z": ["fric", 4], "zz": ["fric", 3]}
 	
-	consonants = consonantdict.keys()
+	consonants = sorted(consonantdict.keys())
 	weights = []
 	fricdict = {}
 	stopdict = {}
@@ -46,7 +46,7 @@ def gen_syll(prevcn):
 	
 	# creates separate lists for fricatives and stops
 	
-	for letter in sorted(consonantdict.keys()):
+	for letter in consonants:
 		weights.append(consonantdict[letter][1])
 		if consonantdict[letter][0] == "fric":
 			fricdict.update({letter: consonantdict[letter][1]})
@@ -67,7 +67,6 @@ def gen_syll(prevcn):
 	if is_onset == 1:
 		onset = choice(consonants, p=weights)
 		syll = syll + onset
-		consonantdict[onset][1] = 0.5
 	
 	# nucleus
 	
@@ -78,14 +77,15 @@ def gen_syll(prevcn):
 	# are there two consonants in the coda? picking from 6 numbers to make the probability of 2 consonants smaller
 	coda_num = rd.randint(1,6)
 	
+	if not coda_num == 2:
+		coda_num = 1
+	
 	# the letters in the list "no" cannot be present in the coda
 	# if there are 2 letters in the coda, there are certain rules (described above) about what they can be
 	
 	no = ["h", "hh", "y", "yy"]
 	
 	if coda_num == 2:
-		
-		codanum = 2
 		
 		for key in sorted(fricdict.keys()):
 			if key not in no:
@@ -97,9 +97,8 @@ def gen_syll(prevcn):
 		
 		filtered = [letter for letter in stopdict.keys() if (len(letter) == len(fric) or letter == "r")]
 		
-		for key in sorted(stopdict.keys()):
-			if key in filtered:
-				stopweights.append(stopdict[key])
+		for key in filtered:
+			stopweights.append(stopdict[key])
 				
 		stopweights = convert(stopweights)
 			
@@ -107,16 +106,14 @@ def gen_syll(prevcn):
 
 	else:
 		
-		codanum = 1
-		
 		endcons = []
 		endweights = []
 		
-		for letter in sorted(consonantdict.keys()):
+		for letter in consonants:
 			if letter not in no:
 				endcons.append(letter)
 		
-		for key in sorted(consonantdict.keys()):
+		for key in consonants:
 			if key in endcons:
 				endweights.append(consonantdict[key][1])
 		
@@ -124,7 +121,7 @@ def gen_syll(prevcn):
 		
 		syll = syll + choice(endcons, p=endweights)
 	
-	return [syll, codanum]
+	return [syll, coda_num]
 
 
 # generates a word made from syllables
@@ -132,16 +129,16 @@ def gen_syll(prevcn):
 
 def generate():
 	
-	codanum = 1
+	coda_num = 1
 	word = ""
 	syllnum = rd.randint(1,3)
 	
 	for x in range(syllnum):
 		
-		output = gen_syll(codanum)
+		output = gen_syll(coda_num)
 		
 		syll = output[0]
-		codanum = output[1]
+		coda_num = output[1]
 		
 		word = word + syll
 			

@@ -1,8 +1,17 @@
-# caemattos word generator
+# Caemattos word generator
 # ae = ash
 
+# In a syllable: onset = starting consonant(s), nucleus = middle vowels, coda = ending consonant(s)
+
 # THE RULES
-# (C)V(C) syllable structure, no coda at the end of a word
+# Syllable structure (C)V(C) -- required nucleus, optional onset and coda -- such that no more than 2 vowels are next to each other. For example: something like /ziala/ would be allowed, but */zioala/ wouldnt.
+# There cannot be a coda at the end of a non-inflected word. That is, most words will end in a vowel.
+# A doubled letter represents a different sound than a single letter
+# For the most part, the single letter is voiceless, and the double is voiced
+# Neither H nor Y are allowed in codas
+# Neither the onset nor the coda of a syllable can be a consonant cluster
+# The only diphthongs allowed are AI, EI, OI, and UI. These fit into the normal V slot.
+
 
 import random as rd
 from numpy.random import choice
@@ -25,7 +34,7 @@ def gen_syll(num, prevnt):
 	
 	# d = diphthong, v = vowel
 	
-	voweldict = {"a": [6, 'v'], "ae": [5, 'v'], "e": [5, 'v'], "i": [6, 'v'], "o": [5, 'v'], "u": [4, 'v'], "ai": [0.5, 'd'], "ei": [0.5, 'd'], "oi": [0.5, 'd'], "ui": [0.5, 'd']}
+	voweldict = {"a": [6, 'v'], "ae": [5, 'v'], "e": [5, 'v'], "i": [6, 'v'], "o": [5, 'v'], "u": [4, 'v'], "ai": [0.7, 'd'], "ei": [0.5, 'd'], "oi": [0.5, 'd'], "ui": [0.5, 'd']}
 	
 	# the numbers in the dict are weights
 	

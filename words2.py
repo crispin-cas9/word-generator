@@ -18,11 +18,14 @@ def convert(list):
 	return newlist
 
 
-def gen_syll(num):
+def gen_syll(num, prevnt):
 	
 	# num is the number syllable it is -- either 'middle' or 'last'. A middle syllable has the structure (C)V(C); the last syllable is (C)V
+	# prevnt = previous nucleus type
 	
-	voweldict = {"a": 6, "ae": 5, "e": 5, "i": 6, "o": 5, "u": 4, "ai": 0.5, "ei": 0.5, "oi": 0.5, "ui": 0.5}
+	# d = diphthong, v = vowel
+	
+	voweldict = {"a": [6, 'v'], "ae": [5, 'v'], "e": [5, 'v'], "i": [6, 'v'], "o": [5, 'v'], "u": [4, 'v'], "ai": [0.5, 'd'], "ei": [0.5, 'd'], "oi": [0.5, 'd'], "ui": [0.5, 'd']}
 	
 	# the numbers in the dict are weights
 	
@@ -37,7 +40,7 @@ def gen_syll(num):
 		weights.append(consonantdict[letter])
 	
 	for letter in vowels:
-		vweights.append(voweldict[letter])
+		vweights.append(voweldict[letter][0])
 	
 	weights = convert(weights)
 	vweights = convert(vweights)
@@ -48,6 +51,9 @@ def gen_syll(num):
 	# onset
 	
 	is_onset = rd.randint(0,2)
+	
+	if prevnt == 'd':
+		is_onset = 1
 
 	if is_onset == 1 or is_onset == 2:
 		onset = choice(consonants, p=weights)
@@ -57,7 +63,12 @@ def gen_syll(num):
 	
 	# nucleus
 	
-	syll = syll + choice(vowels, p=vweights)
+	nucleus = choice(vowels, p=vweights)
+	syll = syll + nucleus
+	if voweldict[nucleus][1] == 'd':
+		nucleustype = 'd'
+	else:
+		nucleustype = 'v'
 	
 	
 	# coda
@@ -89,20 +100,27 @@ def gen_syll(num):
 		syll = syll + choice(endcons, p=endweights)
 	
 	
-	return syll
+	return [syll, nucleustype]
 
 
 # generates a word made from syllables
 
 def generate():
  	
+ 	nucleustype = 'v'
  	word = ""
  	syllnum = rd.randint(1,2)
  	
  	for x in range(syllnum):
- 		word = word + gen_syll('middle')
+ 		
+ 		output = gen_syll('middle', nucleustype)
+		
+		syll = output[0]
+		nucleustype = output[1]
+		
+		word = word + syll
  	
- 	word = word + gen_syll('last')
+ 	word = word + gen_syll('last', nucleustype)[0]
  	
  	return word
 

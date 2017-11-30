@@ -38,7 +38,7 @@ def gen_syll(num, prevnt):
 	
 	# the numbers in the dict are weights
 	
-	consonantdict = {"d": 5, "dd": 4, "c": 6, "cc": 3, "f": 5, "ff": 3, "h": 3, "hh": 2, "l": 4, "ll": 4, "m": 5, "n": 6, "nn": 2, "p": 3, "pp": 2, "r": 5, "rr": 2, "s": 5, "ss": 3, "t": 5, "tt": 3, "y": 4, "yy": 2, "z": 4, "zz": 3}
+	consonantdict = {"d": 5, "dd": 4, "c": 5, "cc": 3, "f": 5, "ff": 3, "h": 3, "hh": 2, "j": 4, "jj": 3, "l": 6, "m": 5, "n": 6, "nn": 2, "p": 3, "pp": 2, "r": 5, "rr": 2, "s": 5, "ss": 3, "t": 5, "tt": 3, "y": 4, "yy": 2, "z": 4, "zz": 3}
 	
 	consonants = sorted(consonantdict.keys())
 	weights = []

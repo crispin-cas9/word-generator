@@ -97,10 +97,8 @@ def gen_syll(num, prevnt):
 	for letter in consonants:
 		if letter not in no:
 			endcons.append(letter)
-	
-	for key in consonants:
-		if key in endcons:
-			endweights.append(consonantdict[key])
+			endweights.append(consonantdict[letter])
+		
 	
 	endweights = convert(endweights)
 	 
